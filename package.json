@@ -18,6 +18,10 @@
       {
         "command": "TrackMyExts.syncNow",
         "title": "TrackMyExts: Force Sync Now"
+      },
+      {
+        "command": "TrackMyExts.restore",
+        "title": "TrackMyExts: Restore Extensions from History"
       }
     ],
     "configuration": {
