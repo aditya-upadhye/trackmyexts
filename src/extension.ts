@@ -103,10 +103,31 @@ async function syncExtensionsToGit() {
 
       if (added.length > 0 && removed.length > 0) {
         commitMsg = `Sync: +${added.length} added, -${removed.length} removed`;
+        vscode.window.showInformationMessage(
+          `TrackMyExts: ${added.length} extension(s) installed, ${removed.length} removed.`,
+        );
+        vscode.window.setStatusBarMessage(
+          `TrackMyExts: ${added.length} added, ${removed.length} removed.`,
+          5000,
+        );
       } else if (added.length > 0) {
         commitMsg = `Installed: ${added.join(", ")}`;
+        vscode.window.showInformationMessage(
+          `TrackMyExts: Installed ${added.length} extension(s): ${added.join(", ")}`,
+        );
+        vscode.window.setStatusBarMessage(
+          `TrackMyExts: Installed ${added.length} extension(s).`,
+          5000,
+        );
       } else if (removed.length > 0) {
         commitMsg = `Uninstalled: ${removed.join(", ")}`;
+        vscode.window.showInformationMessage(
+          `TrackMyExts: Uninstalled ${removed.length} extension(s): ${removed.join(", ")}`,
+        );
+        vscode.window.setStatusBarMessage(
+          `TrackMyExts: Uninstalled ${removed.length} extension(s).`,
+          5000,
+        );
       }
     } catch (parseError) {
       // Keep default message if parsing fails
@@ -181,7 +202,7 @@ async function restoreExtensions() {
   try {
     // 1. Fetch Git history for extensions.json
     const log = execSync(
-      'git log -n 10 --pretty=format:"%h|%ad|%s" --date=short extensions.json',
+      'git log --pretty=format:"%h|%ad|%s" --date=iso-local extensions.json',
       { cwd: repoPath },
     ).toString();
     const lines = log.split("\n").filter((l) => l.trim() !== "");
@@ -192,8 +213,19 @@ async function restoreExtensions() {
     }
 
     const picks = lines.map((line) => {
-      const [hash, date, msg] = line.split("|");
-      return { label: `${date}: ${msg}`, detail: hash };
+      const [hash, dateTime, msg] = line.split("|");
+      // Use regex to extract only date and time (YYYY-MM-DD HH:MM:SS)
+      let dateTimeLabel = dateTime;
+      const match =
+        dateTime &&
+        dateTime.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}:\d{2})/);
+      if (match) {
+        dateTimeLabel = `${match[1]} ${match[2]}`;
+      }
+      return {
+        label: `${dateTimeLabel}: ${msg}`,
+        detail: hash,
+      };
     });
 
     const selected = await vscode.window.showQuickPick(picks, {
