@@ -1,8 +1,13 @@
 {
   "name": "trackmyexts",
+  "publisher": "aditya-upadhye",
   "displayName": "TrackMyExts",
   "description": "Git version control for VS Code extensions",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aditya-upadhye/trackmyexts"
+  },
   "engines": {
     "vscode": "^1.109.0"
   },
